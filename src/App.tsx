@@ -11,29 +11,48 @@ interface Itask {
   isChecked: boolean
 }
 
-const inicialState: Itask[] = [
-  {
-    id: 1,
-    text: "Nova Tarefa",
-    isChecked: false
-  },
-  {
-    id: 2,
-    text: "Nova Tarefa2",
-    isChecked: false
-  }
-];
+const inicialState: Itask[] = [];
 
 function App() {
 
   const [tasks, setTasks] = useState(inicialState);
   const [inputName, setInputName] = useState("");
 
+
   function addTask() {
 
+    if (inputName.trim().length <= 0) {
+      return;
+    }
+
+    const existTask = tasks.find(task => task.text === inputName)
+
+    if (existTask) {
+      return;
+    }
+
+    const newTask: Itask = {
+      id: Math.random(),
+      text: inputName,
+      isChecked: false
+    };
+
+    setTasks((prevState) => [...prevState, newTask])
   }
 
-  function handleCheckTask(id: number) {
+
+  function taskDelete(id: number) {
+    setTasks(prevTasks => prevTasks.filter(
+      task => task.id != id)
+    );
+  }
+
+  function cleanBar() {
+    setInputName("")
+  }
+
+
+  function checkTask(id: number) {
     setTasks(prevTasks =>
       prevTasks.map(task =>
         task.id === id ? { ...task, isChecked: !task.isChecked } : task
@@ -50,21 +69,34 @@ function App() {
 
       <div className="flex flex-col items-center gap-4 w-96">
         <div className="flex flex-row gap-2 w-full">
-        <Input className="border border-gray-400 p-2 rounded-md w-full" />
-        <Button className="bg-blue-500 text-white p-2 rounded-md">New Task</Button>
-        <Button className="bg-gray-400 text-white p-2 rounded-md">Clean</Button>
+        <Input className="border border-gray-400 p-2 rounded-md w-full"
+          onChange={(t) => setInputName(t.target.value)}
+          value={inputName}
+         />
+        <Button className="bg-blue-500 text-white p-2 rounded-md"
+          onClick={addTask}>
+          New Task</Button>
+        <Button className="bg-gray-400 text-white p-2 rounded-md"
+          onClick={cleanBar}>
+          Clean</Button>
         </div>
 
         <div className="flex flex-col gap-2 w-full">
           {tasks.map((task) => {
             return (
               <Card key={task.id} className="mb-2 w-full">
-                <CardContent className="flex flex-col gap-2 w-full p-4 ">
-                  <Checkbox
-                    checked={task.isChecked} // Passa o estado 'isChecked' do objeto
-                    onCheckedChange={() => handleCheckTask(task.id)} // Chama a função ao clicar
-                  />
-                  <p>{task.text}</p>
+                <CardContent className="flex flex-row p-4 items-center justify-between">
+                  <div className="flex flex-row items-center gap-3">
+                    <Checkbox
+                      checked={task.isChecked}
+                      onCheckedChange={() => checkTask(task.id)}
+                    />
+                    <p className={task.isChecked ? "line-through text-gray-500":""}>{task.text}</p>
+                  </div>
+                  <Button className="bg-red-500 text-white p-2 rounded-md"
+                      onClick={() => taskDelete(task.id)}>
+                      Delete
+                  </Button>
                 </CardContent>
               </Card>
             );
