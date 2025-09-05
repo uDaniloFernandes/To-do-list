@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -59,6 +59,15 @@ function App() {
       )
     );
   }
+
+  useEffect(() => {
+    if (tasks) {
+      console.log("Lista de tarefas atualizada!!!")
+    }
+  }
+
+  )
+  
 
   return (
 
